@@ -1,0 +1,82 @@
+# Credentails Mapping:
+# 1 -> alice:verysecure
+# 2 -> test:user
+# 3 -> test:user
+# 12 -> 1 and 2
+# 123 -> 1 and 2 and 3
+
+
+subnets: [1,2]
+topology: [[ 1, 1, 0],
+           [ 1, 1, 1],
+           [ 0, 1, 1]]
+sensitive_hosts:
+  (2, 0): 100
+
+os:
+  - Rasbian
+  - Penbox
+services:
+  - http
+  - ssh
+  - init
+vul: []
+processes:
+  - emtpy
+exploits:
+  e_init:
+    service: init
+    os: None
+    vul : None
+    prob: 1.0
+    cost: 1
+    access: root
+    credentials_needed: 0
+
+  ssh_cred1_login:
+    service: ssh
+    os: None
+    vul: None
+    prob: 1.0
+    cost: 1
+    access: root
+    credentials_needed: 1
+
+privilege_escalation: {}
+service_scan_cost: 1
+os_scan_cost: 1
+vul_scan_cost: 1
+subnet_scan_cost: 1
+process_scan_cost: 1
+wiretapping_cost: 1
+host_configurations:
+  (1, 0):
+    os: Penbox
+    services: [ init ]
+    vul: []
+    processes: []
+    credentials_needed: 0
+    credentials_tofind: 1
+
+  (2, 0):
+    os: Rasbian
+    services: [ssh]
+    vul: []
+    processes: []
+    credentials_needed: 1
+    credentials_tofind: 0
+
+  (2, 1):
+    os: Rasbian
+    services: [http,ssh]
+    vul: []
+    processes: []
+    credentials_needed: 0
+    credentials_tofind: 1
+
+firewall:
+  (0, 1): [ssh, http, init]
+  (1, 0): [ssh, http, init]
+  (2, 1): [ssh, http, init]
+  (1, 2): [ssh, http, init]
+step_limit: 2000

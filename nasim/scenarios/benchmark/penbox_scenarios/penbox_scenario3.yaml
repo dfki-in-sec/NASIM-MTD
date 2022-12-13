@@ -1,0 +1,101 @@
+# Credentails Mapping:
+# 0 -> no credentials
+# 1 -> alice:verysecure
+# 2 -> test:user
+# 3 -> test:user
+# 12 -> 1 and 2
+# 123 -> 1 and 2 and 3
+
+
+subnets: [1,2]
+topology: [[ 1, 1, 0],
+           [ 1, 1, 1],
+           [ 0, 1, 1]]
+sensitive_hosts:
+  (2, 1): 100
+
+os:
+  - Rasbian
+  - Penbox
+services:
+  - samba3.0.20
+  - ssh
+  - init
+vul:
+  - CVE2007
+processes:
+  - shadow
+exploits:
+  e_init:
+    service: init
+    os: None
+    vul : None
+    prob: 1.0
+    cost: 1
+    access: root
+    credentials_needed: 0
+
+  ssh_cred1_login:
+    service: ssh
+    os: None
+    vul: None
+    prob: 1.0
+    cost: 1
+    access: root
+    credentials_needed: 1
+
+  e_ssh:
+    service: samba3.0.20
+    os: Rasbian
+    vul: CVE2007
+    prob: 1.0
+    cost: 3
+    access: root
+    credentials_needed: 0
+
+privilege_escalation:
+  pe_gain_Credentails_from_Shadow:
+    process: shadow
+    os: Rasbian
+    prob: 1.0
+    cost: 1
+    access: root
+    credentials_tofind: 1
+
+service_scan_cost: 1
+os_scan_cost: 1
+vul_scan_cost: 1
+subnet_scan_cost: 1
+process_scan_cost: 1
+wiretapping_cost: 1
+host_configurations:
+  (1, 0):
+    os: Penbox
+    services: [init]
+    vul: []
+    processes: []
+    credentials_needed: 0
+    credentials_tofind: 0
+
+  (2, 0):
+    os: Rasbian
+    services: [ssh, samba3.0.20]
+    vul: [CVE2007]
+    processes: [shadow]
+    credentials_needed: 1
+    credentials_tofind: 0
+
+  (2, 1):
+    os: Rasbian
+    services: [ssh]
+    vul: []
+    processes: []
+    credentials_needed: 1
+    credentials_tofind: 0
+
+firewall:
+  (0, 1): [ssh, init, samba3.0.20]
+  (1, 0): [ssh, init, samba3.0.20]
+  (2, 1): [ssh, init, samba3.0.20]
+  (1, 2): [ssh, init, samba3.0.20]
+step_limit: 2000

@@ -1,0 +1,103 @@
+# Moving Target Scenario Simple
+#
+#MT-T
+
+subnets: [1,2]
+topology: [[ 1, 1, 0],
+           [ 1, 1, 1],
+           [ 0, 1, 1]]
+sensitive_hosts:
+  (2, 1): 100
+
+os:
+  - Rasbian
+  - Penbox
+
+services:
+  - samba3.0.20
+  - opensmtp6.0.6
+  - init
+
+vul:
+  - CVE20072447
+
+processes:
+  - shadow
+
+exploits:
+  e_init:
+    service: init
+    os: None
+    vul : None
+    prob: 1.0
+    cost: 1
+    access: root
+    credentials_needed: 0
+
+  e_samba3.0.20:
+    service: samba3.0.20
+    os: None
+    vul: CVE20072447
+    prob: 1.0
+    cost: 3
+    access: root
+    credentials_needed: 0
+
+  e_opensmtp6.0.6:
+    service: opensmtp6.0.6
+    os: None
+    vul: None
+    prob: 1.0
+    cost: 3
+    access: root
+    credentials_needed: 0
+
+privilege_escalation:
+  pe_gain_Credentails_from_Shadow:
+    process: shadow
+    os: Rasbian
+    prob: 1.0
+    cost: 1
+    access: root
+    credentials_tofind: 1
+
+service_scan_cost: 1
+os_scan_cost: 1
+vul_scan_cost: 1
+subnet_scan_cost: 1
+process_scan_cost: 1
+wiretapping_cost: 1
+
+host_configurations:
+  (1, 0):
+    os: Penbox
+    services: [ init ]
+    vul: []
+    processes: [ ]
+    credentials_needed: 0
+    credentials_tofind: 0
+
+  (2, 0):
+    os: Rasbian
+    services: [opensmtp6.0.6]
+    vul: []
+    processes: []
+    credentials_needed: 0
+    credentials_tofind: 0
+
+  (2, 1):
+    os: Rasbian
+    services: [samba3.0.20]
+    vul: []
+    processes: []
+    credentials_needed: 0
+    credentials_tofind: 0
+
+firewall:
+  (0, 1): [samba3.0.20, opensmtp6.0.6]
+  (1, 0): [samba3.0.20, opensmtp6.0.6]
+  (2, 1): [samba3.0.20, opensmtp6.0.6]
+  (1, 2): [samba3.0.20, opensmtp6.0.6]
+  
+step_limit: 2000
+movement_time: 3
